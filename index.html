@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Space Flight Simulation</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Courier New", monospace;
+        background: #000;
+        color: #00ff00;
+        overflow: hidden;
+      }
+
+      #container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
+
+      #ui {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #00ff00;
+      }
+
+      .info {
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+
+      #controls {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #00ff00;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="ui">
+        <div id="speed" class="info">Speed: 0</div>
+        <div id="position" class="info">Position: (0, 0, 0)</div>
+        <div id="altitude" class="info">Altitude: 0</div>
+      </div>
+
+      <div id="controls">
+        <div><strong>Controls:</strong></div>
+        <div>W/S - Forward/Backward</div>
+        <div>A/D - Turn Left/Right</div>
+        <div>Q/E - Roll Left/Right</div>
+        <div>Space/Shift - Up/Down</div>
+        <div>1/2/3 - Speed Modes</div>
+        <div>Mouse - Look Around</div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
