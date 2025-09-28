@@ -20,6 +20,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Set background color to black (space color) using hex color 0x000000
 renderer.setClearColor(0x000000);
+renderer.setClearAlpha(1.0);
 
 // Add the renderer's canvas element to the HTML container div
 document.getElementById("container").appendChild(renderer.domElement);
@@ -401,8 +402,37 @@ const starfield = {
 };
 
 function createStarfield() {
-  // We'll create stars dynamically based on camera position
+  // Create a fallback static starfield first
+  createStaticStarfield();
   console.log('Infinite starfield system initialized');
+}
+
+function createStaticStarfield() {
+  // Create a large static starfield as fallback
+  const starGeometry = new THREE.BufferGeometry();
+  const starCount = 50000;
+  const positions = new Float32Array(starCount * 3);
+
+  for (let i = 0; i < starCount * 3; i += 3) {
+    // Generate random positions in a much larger area
+    positions[i] = (Math.random() - 0.5) * 100000; // X
+    positions[i + 1] = (Math.random() - 0.5) * 100000; // Y
+    positions[i + 2] = (Math.random() - 0.5) * 100000; // Z
+  }
+
+  starGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  const starMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 1.5,
+    sizeAttenuation: false,
+    transparent: true,
+    opacity: 0.8
+  });
+
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  scene.add(stars);
+  console.log('Static starfield created as fallback');
 }
 
 function updateStarfield() {
@@ -445,6 +475,7 @@ function updateStarfield() {
           const chunk = createStarChunk(x, y, z);
           starfield.chunks.set(key, chunk);
           scene.add(chunk);
+          console.log(`Created star chunk at ${key}`);
         }
       }
     }
@@ -473,13 +504,13 @@ function createStarChunk(chunkX, chunkY, chunkZ) {
   
   starGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   
-  // Create varied star materials
+  // Create varied star materials with better visibility
   const starMaterial = new THREE.PointsMaterial({
     color: 0xffffff,
-    size: 1 + random() * 2, // Vary star sizes
+    size: 2, // Fixed size for better visibility
     sizeAttenuation: false,
     transparent: true,
-    opacity: 0.8 + random() * 0.2 // Vary star brightness
+    opacity: 1.0 // Full opacity for better visibility
   });
   
   return new THREE.Points(starGeometry, starMaterial);
