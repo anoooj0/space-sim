@@ -389,48 +389,109 @@ function createProceduralSpaceship() {
   scene.add(ship.mesh);
 }
 
-// ===================== STARFIELD CREATION =====================
+// ===================== INFINITE STARFIELD CREATION =====================
+
+// Starfield management
+const starfield = {
+  chunks: new Map(), // Store star chunks by their grid position
+  chunkSize: 2000, // Size of each star chunk
+  renderDistance: 3, // How many chunks to render in each direction
+  starsPerChunk: 5000, // Number of stars per chunk
+  camera: null
+};
 
 function createStarfield() {
-  // Create buffer geometry for efficient rendering of many points
-  const starGeometry = new THREE.BufferGeometry();
+  // We'll create stars dynamically based on camera position
+  console.log('Infinite starfield system initialized');
+}
 
-  // Number of stars to generate
-  const starCount = 30000;
-
-  // Create array to hold all star positions (3 numbers per star: x,y,z)
-  const positions = new Float32Array(starCount * 3);
-
-  // Loop through every 3rd index (each star needs x,y,z coordinates)
-  for (let i = 0; i < starCount * 3; i += 3) {
-    // Generate random X position between -10000 and +10000
-    positions[i] = (Math.random() - 0.5) * 20000;
-
-    // Generate random Y position between -10000 and +10000
-    positions[i + 1] = (Math.random() - 0.5) * 20000;
-
-    // Generate random Z position between -10000 and +10000
-    positions[i + 2] = (Math.random() - 0.5) * 20000;
-  }
-
-  // Tell Three.js this array contains position data for the geometry
-  starGeometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(positions, 3)
-  );
-
-  // Create material for stars - white points that don't change size with distance
-  const starMaterial = new THREE.PointsMaterial({
-    color: 0xffffff, // White color
-    size: 2, // Pixel size of each star
-    sizeAttenuation: false, // Stars stay same size regardless of distance
+function updateStarfield() {
+  if (!starfield.camera) return;
+  
+  const cameraPos = starfield.camera.position;
+  const chunkX = Math.floor(cameraPos.x / starfield.chunkSize);
+  const chunkY = Math.floor(cameraPos.y / starfield.chunkSize);
+  const chunkZ = Math.floor(cameraPos.z / starfield.chunkSize);
+  
+  // Remove chunks that are too far away
+  const chunksToRemove = [];
+  starfield.chunks.forEach((chunk, key) => {
+    const [cx, cy, cz] = key.split(',').map(Number);
+    const distance = Math.max(
+      Math.abs(cx - chunkX),
+      Math.abs(cy - chunkY),
+      Math.abs(cz - chunkZ)
+    );
+    
+    if (distance > starfield.renderDistance) {
+      chunksToRemove.push(key);
+    }
   });
+  
+  // Remove distant chunks
+  chunksToRemove.forEach(key => {
+    const chunk = starfield.chunks.get(key);
+    scene.remove(chunk);
+    starfield.chunks.delete(key);
+  });
+  
+  // Create new chunks around the camera
+  for (let x = chunkX - starfield.renderDistance; x <= chunkX + starfield.renderDistance; x++) {
+    for (let y = chunkY - starfield.renderDistance; y <= chunkY + starfield.renderDistance; y++) {
+      for (let z = chunkZ - starfield.renderDistance; z <= chunkZ + starfield.renderDistance; z++) {
+        const key = `${x},${y},${z}`;
+        
+        if (!starfield.chunks.has(key)) {
+          const chunk = createStarChunk(x, y, z);
+          starfield.chunks.set(key, chunk);
+          scene.add(chunk);
+        }
+      }
+    }
+  }
+}
 
-  // Create points object (like mesh but for point clouds)
-  const stars = new THREE.Points(starGeometry, starMaterial);
+function createStarChunk(chunkX, chunkY, chunkZ) {
+  const starGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(starfield.starsPerChunk * 3);
+  
+  // Use seeded random for consistent star positions
+  const seed = chunkX * 1000000 + chunkY * 1000 + chunkZ;
+  const random = seededRandom(seed);
+  
+  for (let i = 0; i < starfield.starsPerChunk * 3; i += 3) {
+    // Generate stars within this chunk
+    const localX = (random() - 0.5) * starfield.chunkSize;
+    const localY = (random() - 0.5) * starfield.chunkSize;
+    const localZ = (random() - 0.5) * starfield.chunkSize;
+    
+    // Convert to world coordinates
+    positions[i] = chunkX * starfield.chunkSize + localX;
+    positions[i + 1] = chunkY * starfield.chunkSize + localY;
+    positions[i + 2] = chunkZ * starfield.chunkSize + localZ;
+  }
+  
+  starGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  
+  // Create varied star materials
+  const starMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 1 + random() * 2, // Vary star sizes
+    sizeAttenuation: false,
+    transparent: true,
+    opacity: 0.8 + random() * 0.2 // Vary star brightness
+  });
+  
+  return new THREE.Points(starGeometry, starMaterial);
+}
 
-  // Add stars to scene
-  scene.add(stars);
+// Seeded random number generator for consistent star positions
+function seededRandom(seed) {
+  let x = Math.sin(seed) * 10000;
+  return function() {
+    x = Math.sin(x) * 10000;
+    return x - Math.floor(x);
+  };
 }
 
 // ===================== SOLAR SYSTEM CREATION =====================
@@ -660,8 +721,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Call functions to create all 3D objects
 createSpaceship(); // Build and add ship to scene
-createStarfield(); // Generate and add 30000 stars
+createStarfield(); // Initialize infinite starfield system
 createSolarSystem(); // Create realistic solar system
+
+// Set camera reference for starfield
+starfield.camera = camera;
 
 // ===================== INITIAL POSITIONING =====================
 
@@ -750,6 +814,9 @@ function animate() {
 
   // Update solar system animation
   updateSolarSystem();
+
+  // Update infinite starfield
+  updateStarfield();
 
   // Render the 3D scene to the screen
   renderer.render(scene, camera);
