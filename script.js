@@ -435,17 +435,17 @@ function createStarfield() {
 
 // ===================== SOLAR SYSTEM CREATION =====================
 
-// Solar system data with realistic relative sizes and distances (scaled down)
+// Solar system data with realistic relative sizes and distances (scaled up for visibility)
 const solarSystem = {
-  sun: { radius: 20, distance: 0, color: 0xffaa44, emissive: 0xff4400, name: "Sun" },
-  mercury: { radius: 0.8, distance: 40, color: 0x8c7853, speed: 0.02, name: "Mercury" },
-  venus: { radius: 1.2, distance: 60, color: 0xffc649, speed: 0.015, name: "Venus" },
-  earth: { radius: 1.3, distance: 80, color: 0x6b93d6, speed: 0.01, hasMoon: true, name: "Earth" },
-  mars: { radius: 0.7, distance: 100, color: 0xc1440e, speed: 0.008, name: "Mars" },
-  jupiter: { radius: 4.5, distance: 140, color: 0xd8ca9d, speed: 0.005, name: "Jupiter" },
-  saturn: { radius: 3.8, distance: 180, color: 0xfad5a5, speed: 0.003, hasRings: true, name: "Saturn" },
-  uranus: { radius: 1.6, distance: 220, color: 0x4fd0e7, speed: 0.002, name: "Uranus" },
-  neptune: { radius: 1.5, distance: 260, color: 0x4b70dd, speed: 0.001, name: "Neptune" }
+  sun: { radius: 25, distance: 0, color: 0xffaa44, emissive: 0xff4400, name: "Sun" },
+  mercury: { radius: 2.5, distance: 50, color: 0x8c7853, speed: 0.02, name: "Mercury" },
+  venus: { radius: 3.5, distance: 70, color: 0xffc649, speed: 0.015, name: "Venus" },
+  earth: { radius: 4, distance: 90, color: 0x6b93d6, speed: 0.01, hasMoon: true, name: "Earth" },
+  mars: { radius: 2.2, distance: 110, color: 0xc1440e, speed: 0.008, name: "Mars" },
+  jupiter: { radius: 12, distance: 150, color: 0xd8ca9d, speed: 0.005, name: "Jupiter" },
+  saturn: { radius: 10, distance: 190, color: 0xfad5a5, speed: 0.003, hasRings: true, name: "Saturn" },
+  uranus: { radius: 5, distance: 230, color: 0x4fd0e7, speed: 0.002, name: "Uranus" },
+  neptune: { radius: 4.5, distance: 270, color: 0x4b70dd, speed: 0.001, name: "Neptune" }
 };
 
 const planets = [];
@@ -538,11 +538,11 @@ function createPlanets() {
 }
 
 function createMoon(planet) {
-  const moonGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+  const moonGeometry = new THREE.SphereGeometry(0.8, 16, 16); // Scaled up moon
   const moonMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
   
   const moon = new THREE.Mesh(moonGeometry, moonMaterial);
-  moon.position.set(planet.position.x + 3, 0, 0);
+  moon.position.set(planet.position.x + 6, 0, 0); // Scaled up distance
   moon.castShadow = true;
   moon.receiveShadow = true;
   scene.add(moon);
@@ -550,7 +550,7 @@ function createMoon(planet) {
   moons.push({
     mesh: moon,
     parent: planet,
-    distance: 3,
+    distance: 6, // Scaled up distance
     angle: Math.random() * Math.PI * 2,
     speed: 0.05
   });
@@ -574,13 +574,13 @@ function createRings(planet) {
 }
 
 function createAsteroidBelt() {
-  const asteroidCount = 200;
-  const innerRadius = 120; // Between Mars and Jupiter
-  const outerRadius = 160;
+  const asteroidCount = 300; // More asteroids for better visibility
+  const innerRadius = 130; // Between Mars and Jupiter (scaled up)
+  const outerRadius = 170;
   
   for (let i = 0; i < asteroidCount; i++) {
     const asteroidGeometry = new THREE.SphereGeometry(
-      Math.random() * 0.3 + 0.1, // Random size
+      Math.random() * 0.8 + 0.2, // Scaled up asteroid sizes
       8, 8
     );
     const asteroidMaterial = new THREE.MeshPhongMaterial({
@@ -593,7 +593,7 @@ function createAsteroidBelt() {
     // Random position in belt
     const angle = Math.random() * Math.PI * 2;
     const distance = innerRadius + Math.random() * (outerRadius - innerRadius);
-    const height = (Math.random() - 0.5) * 20; // Random height variation
+    const height = (Math.random() - 0.5) * 30; // Scaled up height variation
     
     asteroid.position.set(
       Math.cos(angle) * distance,
