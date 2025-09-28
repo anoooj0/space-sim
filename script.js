@@ -42,77 +42,194 @@ function createSpaceship() {
   // Create main ship group to hold all parts
   ship.mesh = new THREE.Group();
 
-  // === MAIN HULL ===
-  const hullGeometry = new THREE.CylinderGeometry(0.3, 0.1, 3, 12);
-  const hullMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x4a5568,
-    shininess: 100,
-    specular: 0x222222
+  // === ENHANCED MATERIALS ===
+  const metallicMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x8a9ba8,
+    shininess: 300,
+    specular: 0x666666,
+    metalness: 0.8
   });
-  const hull = new THREE.Mesh(hullGeometry, hullMaterial);
-  hull.rotation.z = Math.PI / 2; // Point forward
+
+  const darkMetalMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x2c3e50,
+    shininess: 200,
+    specular: 0x444444,
+    metalness: 0.9
+  });
+
+  const cockpitMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x1a1a2e,
+    transparent: true,
+    opacity: 0.85,
+    shininess: 400,
+    specular: 0x888888,
+    metalness: 0.3
+  });
+
+  // === MAIN HULL (More Realistic Shape) ===
+  // Create a more sophisticated hull using multiple parts
+  const hullGeometry = new THREE.CylinderGeometry(0.4, 0.15, 3.5, 16);
+  const hull = new THREE.Mesh(hullGeometry, metallicMaterial);
+  hull.rotation.z = Math.PI / 2;
+  hull.castShadow = true;
+  hull.receiveShadow = true;
   ship.mesh.add(hull);
 
-  // === COCKPIT ===
-  const cockpitGeometry = new THREE.SphereGeometry(0.4, 12, 8, 0, Math.PI);
-  const cockpitMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x1a202c,
-    transparent: true,
-    opacity: 0.8,
-    shininess: 150
+  // Hull nose cone
+  const noseGeometry = new THREE.ConeGeometry(0.15, 0.8, 12);
+  const nose = new THREE.Mesh(noseGeometry, metallicMaterial);
+  nose.position.set(2.1, 0, 0);
+  nose.rotation.z = Math.PI / 2;
+  nose.castShadow = true;
+  nose.receiveShadow = true;
+  ship.mesh.add(nose);
+
+  // Hull details - panels and ridges
+  const panelGeometry = new THREE.BoxGeometry(0.05, 0.3, 2.5);
+  const panelMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x34495e,
+    shininess: 150,
+    specular: 0x333333
   });
+
+  // Top panel
+  const topPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+  topPanel.position.set(0, 0.45, 0);
+  topPanel.rotation.z = Math.PI / 2;
+  ship.mesh.add(topPanel);
+
+  // Bottom panel
+  const bottomPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+  bottomPanel.position.set(0, -0.45, 0);
+  bottomPanel.rotation.z = Math.PI / 2;
+  ship.mesh.add(bottomPanel);
+
+  // === ENHANCED COCKPIT ===
+  const cockpitGeometry = new THREE.SphereGeometry(0.5, 16, 12, 0, Math.PI);
   const cockpit = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
-  cockpit.position.x = 1.2;
+  cockpit.position.set(1.4, 0, 0);
   cockpit.rotation.y = Math.PI / 2;
   ship.mesh.add(cockpit);
 
-  // === WINGS ===
-  const wingGeometry = new THREE.BoxGeometry(0.8, 0.1, 1.5);
-  const wingMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x2d3748,
-    shininess: 80
+  // Cockpit frame
+  const frameGeometry = new THREE.TorusGeometry(0.52, 0.03, 8, 16, Math.PI);
+  const frameMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x7f8c8d,
+    shininess: 300,
+    specular: 0x666666
   });
-  
-  // Left wing
-  const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-  leftWing.position.set(0, 0.6, 0);
-  ship.mesh.add(leftWing);
-  
-  // Right wing
-  const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-  rightWing.position.set(0, -0.6, 0);
-  ship.mesh.add(rightWing);
+  const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+  frame.position.set(1.4, 0, 0);
+  frame.rotation.y = Math.PI / 2;
+  ship.mesh.add(frame);
 
-  // === ENGINE NOZZLES ===
-  const nozzleGeometry = new THREE.CylinderGeometry(0.15, 0.2, 0.6, 8);
-  const nozzleMaterial = new THREE.MeshPhongMaterial({ 
-    color: 0x1a1a1a,
+  // === REALISTIC WINGS ===
+  // Create swept-back wings with more detail
+  const wingGeometry = new THREE.BoxGeometry(1.2, 0.15, 2.0);
+  const wingMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x34495e,
     shininess: 200,
     specular: 0x444444
   });
   
-  // Left engine
+  // Left wing with sweep
+  const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+  leftWing.position.set(-0.3, 0.7, 0);
+  leftWing.rotation.set(0, 0, -0.2);
+  ship.mesh.add(leftWing);
+  
+  // Right wing with sweep
+  const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+  rightWing.position.set(-0.3, -0.7, 0);
+  rightWing.rotation.set(0, 0, 0.2);
+  ship.mesh.add(rightWing);
+
+  // Wing tips
+  const wingTipGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.8);
+  const leftWingTip = new THREE.Mesh(wingTipGeometry, darkMetalMaterial);
+  leftWingTip.position.set(-0.8, 1.2, 0);
+  leftWingTip.rotation.set(0, 0, -0.2);
+  ship.mesh.add(leftWingTip);
+
+  const rightWingTip = new THREE.Mesh(wingTipGeometry, darkMetalMaterial);
+  rightWingTip.position.set(-0.8, -1.2, 0);
+  rightWingTip.rotation.set(0, 0, 0.2);
+  ship.mesh.add(rightWingTip);
+
+  // === ENHANCED ENGINE SYSTEM ===
+  // Main engine housing
+  const engineHousingGeometry = new THREE.CylinderGeometry(0.25, 0.3, 1.0, 12);
+  const engineHousingMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x2c3e50,
+    shininess: 300,
+    specular: 0x555555
+  });
+
+  // Left engine housing
+  const leftEngineHousing = new THREE.Mesh(engineHousingGeometry, engineHousingMaterial);
+  leftEngineHousing.position.set(-1.8, 0.5, 0);
+  leftEngineHousing.rotation.z = Math.PI / 2;
+  ship.mesh.add(leftEngineHousing);
+
+  // Right engine housing
+  const rightEngineHousing = new THREE.Mesh(engineHousingGeometry, engineHousingMaterial);
+  rightEngineHousing.position.set(-1.8, -0.5, 0);
+  rightEngineHousing.rotation.z = Math.PI / 2;
+  ship.mesh.add(rightEngineHousing);
+
+  // Engine nozzles with more detail
+  const nozzleGeometry = new THREE.CylinderGeometry(0.12, 0.18, 0.8, 12);
+  const nozzleMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x1a1a1a,
+    shininess: 400,
+    specular: 0x888888,
+    metalness: 0.9
+  });
+  
+  // Left engine nozzle
   const leftEngine = new THREE.Mesh(nozzleGeometry, nozzleMaterial);
-  leftEngine.position.set(-1.3, 0.4, 0);
+  leftEngine.position.set(-2.4, 0.5, 0);
   leftEngine.rotation.z = Math.PI / 2;
   ship.mesh.add(leftEngine);
   
-  // Right engine
+  // Right engine nozzle
   const rightEngine = new THREE.Mesh(nozzleGeometry, nozzleMaterial);
-  rightEngine.position.set(-1.3, -0.4, 0);
+  rightEngine.position.set(-2.4, -0.5, 0);
   rightEngine.rotation.z = Math.PI / 2;
   ship.mesh.add(rightEngine);
 
-  // === NAVIGATION LIGHTS ===
-  // Red light (port/left)
-  const redLightGeometry = new THREE.SphereGeometry(0.05, 6, 6);
+  // Engine cooling fins
+  const finGeometry = new THREE.BoxGeometry(0.02, 0.3, 0.4);
+  const finMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x34495e,
+    shininess: 200
+  });
+
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const fin = new THREE.Mesh(finGeometry, finMaterial);
+    fin.position.set(-1.8, 0.5 + Math.cos(angle) * 0.25, Math.sin(angle) * 0.25);
+    fin.rotation.z = Math.PI / 2;
+    fin.rotation.y = angle;
+    ship.mesh.add(fin);
+
+    const fin2 = new THREE.Mesh(finGeometry, finMaterial);
+    fin2.position.set(-1.8, -0.5 + Math.cos(angle) * 0.25, Math.sin(angle) * 0.25);
+    fin2.rotation.z = Math.PI / 2;
+    fin2.rotation.y = angle;
+    ship.mesh.add(fin2);
+  }
+
+  // === NAVIGATION LIGHTS (Enhanced) ===
+  // Red light (port/left) - more realistic
+  const redLightGeometry = new THREE.SphereGeometry(0.08, 8, 8);
   const redLightMaterial = new THREE.MeshBasicMaterial({ 
     color: 0xff0000,
     transparent: true,
     opacity: 0.9
   });
   const redLight = new THREE.Mesh(redLightGeometry, redLightMaterial);
-  redLight.position.set(0.5, 0.8, 0);
+  redLight.position.set(0.8, 1.0, 0);
   ship.mesh.add(redLight);
   
   // Green light (starboard/right)
@@ -122,33 +239,83 @@ function createSpaceship() {
     opacity: 0.9
   });
   const greenLight = new THREE.Mesh(redLightGeometry, greenLightMaterial);
-  greenLight.position.set(0.5, -0.8, 0);
+  greenLight.position.set(0.8, -1.0, 0);
   ship.mesh.add(greenLight);
 
-  // === ENGINE EFFECTS ===
-  // Main engine glow
-  const glowGeometry = new THREE.ConeGeometry(0.25, 1.2, 8);
+  // White strobe light on top
+  const strobeGeometry = new THREE.SphereGeometry(0.06, 8, 8);
+  const strobeMaterial = new THREE.MeshBasicMaterial({ 
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.9
+  });
+  const strobeLight = new THREE.Mesh(strobeGeometry, strobeMaterial);
+  strobeLight.position.set(0.5, 0, 0.3);
+  ship.mesh.add(strobeLight);
+
+  // === ANTENNA AND SENSORS ===
+  // Communication antenna
+  const antennaGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.6, 6);
+  const antennaMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x7f8c8d,
+    shininess: 300
+  });
+  const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+  antenna.position.set(1.8, 0, 0);
+  ship.mesh.add(antenna);
+
+  // Sensor array
+  const sensorGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.2);
+  const sensorMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x95a5a6,
+    shininess: 400
+  });
+  const sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
+  sensor.position.set(1.9, 0, 0);
+  ship.mesh.add(sensor);
+
+  // === ENHANCED ENGINE EFFECTS ===
+  // More realistic engine glow with multiple layers
+  const glowGeometry = new THREE.ConeGeometry(0.3, 1.5, 12);
   const glowMaterial = new THREE.MeshBasicMaterial({
     color: 0x00aaff,
     transparent: true,
-    opacity: 0.7
+    opacity: 0.8
   });
   
   // Left engine glow
   const leftGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-  leftGlow.position.set(-2.1, 0.4, 0);
+  leftGlow.position.set(-2.8, 0.5, 0);
   leftGlow.rotation.z = -Math.PI / 2;
   ship.mesh.add(leftGlow);
   
   // Right engine glow
   const rightGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-  rightGlow.position.set(-2.1, -0.4, 0);
+  rightGlow.position.set(-2.8, -0.5, 0);
   rightGlow.rotation.z = -Math.PI / 2;
   ship.mesh.add(rightGlow);
 
+  // Inner engine glow (hotter core)
+  const innerGlowGeometry = new THREE.ConeGeometry(0.15, 1.0, 8);
+  const innerGlowMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.9
+  });
+
+  const leftInnerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial);
+  leftInnerGlow.position.set(-2.6, 0.5, 0);
+  leftInnerGlow.rotation.z = -Math.PI / 2;
+  ship.mesh.add(leftInnerGlow);
+
+  const rightInnerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial);
+  rightInnerGlow.position.set(-2.6, -0.5, 0);
+  rightInnerGlow.rotation.z = -Math.PI / 2;
+  ship.mesh.add(rightInnerGlow);
+
   // Store engine glows and navigation lights for animation
-  ship.engineGlows = [leftGlow, rightGlow];
-  ship.navLights = [redLight, greenLight];
+  ship.engineGlows = [leftGlow, rightGlow, leftInnerGlow, rightInnerGlow];
+  ship.navLights = [redLight, greenLight, strobeLight];
 
   // Add the ship group to the scene
   scene.add(ship.mesh);
@@ -227,20 +394,41 @@ function createPlanets() {
   });
 }
 
-// ===================== LIGHTING SETUP =====================
+// ===================== ENHANCED LIGHTING SETUP =====================
 
 // Create ambient light - provides dim lighting to all objects equally
-// Color 0x404040 = dark gray, intensity 0.4 = 40% brightness
-const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+// Color 0x404040 = dark gray, intensity 0.3 = 30% brightness (reduced for more dramatic lighting)
+const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
 scene.add(ambientLight);
 
-// Create directional light - acts like sunlight from a specific direction
-// Color 0xffffff = white, intensity 0.6 = 60% brightness
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-
-// Position light source at coordinates (100, 100, 50)
+// Create main directional light - acts like sunlight from a specific direction
+// Color 0xffffff = white, intensity 0.8 = 80% brightness
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(100, 100, 50);
+directionalLight.castShadow = true; // Enable shadows
+directionalLight.shadow.mapSize.width = 2048; // High quality shadows
+directionalLight.shadow.mapSize.height = 2048;
+directionalLight.shadow.camera.near = 0.5;
+directionalLight.shadow.camera.far = 500;
+directionalLight.shadow.camera.left = -100;
+directionalLight.shadow.camera.right = 100;
+directionalLight.shadow.camera.top = 100;
+directionalLight.shadow.camera.bottom = -100;
 scene.add(directionalLight);
+
+// Add a second directional light from a different angle for better illumination
+const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.3); // Blue tinted fill light
+fillLight.position.set(-50, 50, -30);
+scene.add(fillLight);
+
+// Add rim lighting for more dramatic effect
+const rimLight = new THREE.DirectionalLight(0x87ceeb, 0.2); // Light blue rim light
+rimLight.position.set(0, 0, -100);
+scene.add(rimLight);
+
+// Enable shadows on the renderer
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
 
 // ===================== INITIALIZE GAME OBJECTS =====================
 
@@ -422,9 +610,10 @@ function updateShip() {
     const engineIntensity = Math.abs(ship.acceleration) / 2.0;
     const time = Date.now() * 0.005; // Time for animation
     
-    ship.engineGlows.forEach((glow, index) => {
+    // Handle outer engine glows (first 2 elements)
+    ship.engineGlows.slice(0, 2).forEach((glow, index) => {
       // Animate engine glow opacity based on thrust
-      glow.material.opacity = 0.3 + engineIntensity * 0.7 + Math.sin(time + index) * 0.1;
+      glow.material.opacity = 0.2 + engineIntensity * 0.6 + Math.sin(time + index) * 0.1;
       
       // Scale engine flames based on acceleration
       const scale = 0.8 + engineIntensity * 0.5 + Math.sin(time * 2 + index) * 0.1;
@@ -440,6 +629,25 @@ function updateShip() {
       } else {
         // Idle - dim blue
         glow.material.color.setHSL(0.6, 0.8, 0.3);
+      }
+    });
+
+    // Handle inner engine glows (hotter core - last 2 elements)
+    ship.engineGlows.slice(2, 4).forEach((glow, index) => {
+      // More intense animation for inner core
+      glow.material.opacity = 0.4 + engineIntensity * 0.5 + Math.sin(time * 3 + index) * 0.2;
+      
+      // Scale inner core flames
+      const scale = 0.9 + engineIntensity * 0.3 + Math.sin(time * 4 + index) * 0.15;
+      glow.scale.set(scale, scale, scale);
+      
+      // Inner core is always white/blue-white
+      if (ship.acceleration > 0) {
+        glow.material.color.setHSL(0.6, 0.2, 0.8 + engineIntensity * 0.2);
+      } else if (ship.acceleration < 0) {
+        glow.material.color.setHSL(0.1, 0.8, 0.7 + engineIntensity * 0.3);
+      } else {
+        glow.material.color.setHSL(0.6, 0.1, 0.6);
       }
     });
   }
