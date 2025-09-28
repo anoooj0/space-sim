@@ -51,7 +51,7 @@ function createSpaceship() {
 
 function loadSpaceshipModel() {
   // Check if there's a spaceship model in the assets folder
-  const modelPath = './assets/spaceship.gltf'; // You can change this path
+  const modelPath = './assets/Baked_Animations_Intergalactic_Spaceships_Version_2.gltf'; // You can change this path
   
   loader.load(
     modelPath,
@@ -63,7 +63,7 @@ function loadSpaceshipModel() {
       const model = gltf.scene;
       
       // Scale the model to appropriate size (adjust as needed)
-      model.scale.set(2, 2, 2); // Scale up the model
+      model.scale.set(0.5, 0.5, 0.5); // Scale down the model (professional models are often large)
       
       // Position the model (adjust as needed)
       model.position.set(0, 0, 0);
