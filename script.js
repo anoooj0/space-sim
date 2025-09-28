@@ -433,77 +433,235 @@ function createStarfield() {
   scene.add(stars);
 }
 
-// ===================== PLANET CREATION =====================
+// ===================== SOLAR SYSTEM CREATION =====================
+
+// Solar system data with realistic relative sizes and distances (scaled down)
+const solarSystem = {
+  sun: { radius: 20, distance: 0, color: 0xffaa44, emissive: 0xff4400, name: "Sun" },
+  mercury: { radius: 0.8, distance: 40, color: 0x8c7853, speed: 0.02, name: "Mercury" },
+  venus: { radius: 1.2, distance: 60, color: 0xffc649, speed: 0.015, name: "Venus" },
+  earth: { radius: 1.3, distance: 80, color: 0x6b93d6, speed: 0.01, hasMoon: true, name: "Earth" },
+  mars: { radius: 0.7, distance: 100, color: 0xc1440e, speed: 0.008, name: "Mars" },
+  jupiter: { radius: 4.5, distance: 140, color: 0xd8ca9d, speed: 0.005, name: "Jupiter" },
+  saturn: { radius: 3.8, distance: 180, color: 0xfad5a5, speed: 0.003, hasRings: true, name: "Saturn" },
+  uranus: { radius: 1.6, distance: 220, color: 0x4fd0e7, speed: 0.002, name: "Uranus" },
+  neptune: { radius: 1.5, distance: 260, color: 0x4b70dd, speed: 0.001, name: "Neptune" }
+};
+
+const planets = [];
+const moons = [];
+
+function createSolarSystem() {
+  // Create the Sun
+  createSun();
+  
+  // Create planets
+  createPlanets();
+  
+  // Create asteroid belt
+  createAsteroidBelt();
+  
+  // Create background nebula
+  createNebula();
+}
+
+function createSun() {
+  // Sun geometry
+  const sunGeometry = new THREE.SphereGeometry(solarSystem.sun.radius, 32, 32);
+  
+  // Sun material with emission for glow effect
+  const sunMaterial = new THREE.MeshBasicMaterial({
+    color: solarSystem.sun.color,
+    emissive: solarSystem.sun.emissive,
+    emissiveIntensity: 0.3
+  });
+  
+  const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+  sun.position.set(0, 0, 0);
+  sun.castShadow = false; // Sun doesn't cast shadows
+  sun.receiveShadow = false;
+  scene.add(sun);
+  
+  // Add sun glow effect
+  const glowGeometry = new THREE.SphereGeometry(solarSystem.sun.radius * 1.2, 32, 32);
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffaa44,
+    transparent: true,
+    opacity: 0.1
+  });
+  const sunGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+  sunGlow.position.set(0, 0, 0);
+  scene.add(sunGlow);
+  
+  // Store sun for animation
+  solarSystem.sun.mesh = sun;
+  solarSystem.sun.glow = sunGlow;
+}
 
 function createPlanets() {
-  // Array of planet data: position [x,y,z], size (radius), color
-  const planets = [
-    { pos: [1000, 0, 0], size: 50, color: 0xff6666 }, // Red planet to the right
-    { pos: [-800, 500, 1200], size: 30, color: 0x66ff66 }, // Green planet up-left-back
-    { pos: [0, -1500, 800], size: 100, color: 0x6666ff }, // Large blue planet below-back
-  ];
-
-  // Loop through each planet definition
-  planets.forEach((planet) => {
-    // Create sphere geometry with radius, width segments, height segments
-    const geometry = new THREE.SphereGeometry(planet.size, 32, 32);
-
-    // Create Lambert material (responds to light) with planet's color
-    const material = new THREE.MeshLambertMaterial({ color: planet.color });
-
-    // Combine geometry and material into mesh
-    const mesh = new THREE.Mesh(geometry, material);
-
-    // Set planet position using spread operator to unpack [x,y,z] array
-    mesh.position.set(...planet.pos);
-
-    // Add planet to scene
-    scene.add(mesh);
+  Object.keys(solarSystem).forEach(planetName => {
+    if (planetName === 'sun') return;
+    
+    const planetData = solarSystem[planetName];
+    
+    // Create planet geometry
+    const planetGeometry = new THREE.SphereGeometry(planetData.radius, 32, 32);
+    
+    // Create planet material
+    const planetMaterial = new THREE.MeshPhongMaterial({
+      color: planetData.color,
+      shininess: 100,
+      specular: 0x222222
+    });
+    
+    const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+    planet.position.set(planetData.distance, 0, 0);
+    planet.castShadow = true;
+    planet.receiveShadow = true;
+    scene.add(planet);
+    
+    // Store planet data for animation
+    planetData.mesh = planet;
+    planetData.angle = Math.random() * Math.PI * 2; // Random starting position
+    planets.push(planetData);
+    
+    // Create moon for Earth
+    if (planetName === 'earth' && planetData.hasMoon) {
+      createMoon(planet);
+    }
+    
+    // Create rings for Saturn
+    if (planetName === 'saturn' && planetData.hasRings) {
+      createRings(planet);
+    }
   });
 }
 
-// ===================== ENHANCED LIGHTING SETUP =====================
+function createMoon(planet) {
+  const moonGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+  const moonMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+  
+  const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+  moon.position.set(planet.position.x + 3, 0, 0);
+  moon.castShadow = true;
+  moon.receiveShadow = true;
+  scene.add(moon);
+  
+  moons.push({
+    mesh: moon,
+    parent: planet,
+    distance: 3,
+    angle: Math.random() * Math.PI * 2,
+    speed: 0.05
+  });
+}
 
-// Create ambient light - provides dim lighting to all objects equally
-// Color 0x404040 = dark gray, intensity 0.3 = 30% brightness (reduced for more dramatic lighting)
-const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+function createRings(planet) {
+  const ringGeometry = new THREE.RingGeometry(planet.geometry.parameters.radius * 1.5, planet.geometry.parameters.radius * 2.5, 32);
+  const ringMaterial = new THREE.MeshPhongMaterial({
+    color: 0xaaaaaa,
+    transparent: true,
+    opacity: 0.6,
+    side: THREE.DoubleSide
+  });
+  
+  const rings = new THREE.Mesh(ringGeometry, ringMaterial);
+  rings.rotation.x = Math.PI / 2;
+  rings.position.copy(planet.position);
+  scene.add(rings);
+  
+  planet.rings = rings;
+}
+
+function createAsteroidBelt() {
+  const asteroidCount = 200;
+  const innerRadius = 120; // Between Mars and Jupiter
+  const outerRadius = 160;
+  
+  for (let i = 0; i < asteroidCount; i++) {
+    const asteroidGeometry = new THREE.SphereGeometry(
+      Math.random() * 0.3 + 0.1, // Random size
+      8, 8
+    );
+    const asteroidMaterial = new THREE.MeshPhongMaterial({
+      color: 0x666666,
+      shininess: 50
+    });
+    
+    const asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+    
+    // Random position in belt
+    const angle = Math.random() * Math.PI * 2;
+    const distance = innerRadius + Math.random() * (outerRadius - innerRadius);
+    const height = (Math.random() - 0.5) * 20; // Random height variation
+    
+    asteroid.position.set(
+      Math.cos(angle) * distance,
+      height,
+      Math.sin(angle) * distance
+    );
+    
+    asteroid.castShadow = true;
+    asteroid.receiveShadow = true;
+    scene.add(asteroid);
+    
+    // Store for animation
+    asteroid.userData = {
+      angle: angle,
+      distance: distance,
+      speed: 0.001 + Math.random() * 0.002
+    };
+  }
+}
+
+function createNebula() {
+  // Create a subtle nebula background
+  const nebulaGeometry = new THREE.SphereGeometry(2000, 32, 32);
+  const nebulaMaterial = new THREE.MeshBasicMaterial({
+    color: 0x220044,
+    transparent: true,
+    opacity: 0.1,
+    side: THREE.BackSide
+  });
+  
+  const nebula = new THREE.Mesh(nebulaGeometry, nebulaMaterial);
+  scene.add(nebula);
+}
+
+// ===================== REALISTIC SOLAR LIGHTING SETUP =====================
+
+// Create ambient light - very dim for space
+const ambientLight = new THREE.AmbientLight(0x202040, 0.1);
 scene.add(ambientLight);
 
-// Create main directional light - acts like sunlight from a specific direction
-// Color 0xffffff = white, intensity 0.8 = 80% brightness
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-directionalLight.position.set(100, 100, 50);
-directionalLight.castShadow = true; // Enable shadows
-directionalLight.shadow.mapSize.width = 2048; // High quality shadows
-directionalLight.shadow.mapSize.height = 2048;
-directionalLight.shadow.camera.near = 0.5;
-directionalLight.shadow.camera.far = 500;
-directionalLight.shadow.camera.left = -100;
-directionalLight.shadow.camera.right = 100;
-directionalLight.shadow.camera.top = 100;
-directionalLight.shadow.camera.bottom = -100;
-scene.add(directionalLight);
+// Create the Sun as the main light source
+const sunLight = new THREE.PointLight(0xffaa44, 2, 1000);
+sunLight.position.set(0, 0, 0);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 2048;
+sunLight.shadow.mapSize.height = 2048;
+sunLight.shadow.camera.near = 0.1;
+sunLight.shadow.camera.far = 1000;
+scene.add(sunLight);
 
-// Add a second directional light from a different angle for better illumination
-const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.3); // Blue tinted fill light
-fillLight.position.set(-50, 50, -30);
+// Store sun light for animation
+solarSystem.sun.light = sunLight;
+
+// Add subtle fill light for better visibility
+const fillLight = new THREE.DirectionalLight(0x4a90e2, 0.2);
+fillLight.position.set(50, 50, 50);
 scene.add(fillLight);
-
-// Add rim lighting for more dramatic effect
-const rimLight = new THREE.DirectionalLight(0x87ceeb, 0.2); // Light blue rim light
-rimLight.position.set(0, 0, -100);
-scene.add(rimLight);
 
 // Enable shadows on the renderer
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // ===================== INITIALIZE GAME OBJECTS =====================
 
 // Call functions to create all 3D objects
 createSpaceship(); // Build and add ship to scene
-createStarfield(); // Generate and add 10000 stars
-createPlanets(); // Create and add 3 planets
+createStarfield(); // Generate and add 30000 stars
+createSolarSystem(); // Create realistic solar system
 
 // ===================== INITIAL POSITIONING =====================
 
@@ -589,6 +747,9 @@ function animate() {
 
   // Update the HTML UI elements with current ship data
   updateUI();
+
+  // Update solar system animation
+  updateSolarSystem();
 
   // Render the 3D scene to the screen
   renderer.render(scene, camera);
@@ -756,8 +917,22 @@ function updateUI() {
   // Get ship's current 3D position
   const pos = ship.mesh.position;
 
-  // Calculate distance from origin (0,0,0) - useful for navigation
-  const altitude = Math.round(pos.length());
+  // Calculate distance from sun (origin) - useful for navigation
+  const distanceFromSun = Math.round(pos.length());
+
+  // Find nearest planet
+  let nearestPlanet = "Space";
+  let nearestDistance = Infinity;
+  
+  planets.forEach(planet => {
+    if (planet.mesh) {
+      const distance = pos.distanceTo(planet.mesh.position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestPlanet = planet.name || "Unknown";
+      }
+    }
+  });
 
   // Update speed display with current speed and mode
   document.getElementById(
@@ -769,10 +944,49 @@ function updateUI() {
     pos.x
   )}, ${Math.round(pos.y)}, ${Math.round(pos.z)})`;
 
-  // Update distance from origin
+  // Update distance from sun and nearest planet
   document.getElementById(
     "altitude"
-  ).textContent = `Distance from Origin: ${altitude}`;
+  ).textContent = `Distance from Sun: ${distanceFromSun} | Near: ${nearestPlanet}`;
+}
+
+// ===================== SOLAR SYSTEM ANIMATION =====================
+
+function updateSolarSystem() {
+  // Animate planets in their orbits
+  planets.forEach(planet => {
+    if (planet.mesh) {
+      planet.angle += planet.speed;
+      planet.mesh.position.x = Math.cos(planet.angle) * planet.distance;
+      planet.mesh.position.z = Math.sin(planet.angle) * planet.distance;
+      
+      // Update rings position for Saturn
+      if (planet.rings) {
+        planet.rings.position.copy(planet.mesh.position);
+      }
+    }
+  });
+  
+  // Animate moons
+  moons.forEach(moon => {
+    moon.angle += moon.speed;
+    moon.mesh.position.x = moon.parent.position.x + Math.cos(moon.angle) * moon.distance;
+    moon.mesh.position.z = moon.parent.position.z + Math.sin(moon.angle) * moon.distance;
+  });
+  
+  // Animate asteroids
+  scene.children.forEach(child => {
+    if (child.userData && child.userData.angle !== undefined) {
+      child.userData.angle += child.userData.speed;
+      child.position.x = Math.cos(child.userData.angle) * child.userData.distance;
+      child.position.z = Math.sin(child.userData.angle) * child.userData.distance;
+    }
+  });
+  
+  // Animate sun glow
+  if (solarSystem.sun.glow) {
+    solarSystem.sun.glow.rotation.y += 0.001;
+  }
 }
 
 // ===================== WINDOW RESIZE HANDLING =====================
