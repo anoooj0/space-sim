@@ -45,7 +45,7 @@ const loader = new THREE.GLTFLoader();
 function createSpaceship() {
   // Create main ship group to hold all parts
   ship.mesh = new THREE.Group();
-  
+
   // Try to load a 3D model first, fallback to procedural if not found
   loadSpaceshipModel();
 }
