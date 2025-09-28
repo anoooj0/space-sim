@@ -70,7 +70,7 @@ function createSpaceship() {
   // Create a more sophisticated hull using multiple parts
   const hullGeometry = new THREE.CylinderGeometry(0.4, 0.15, 3.5, 16);
   const hull = new THREE.Mesh(hullGeometry, metallicMaterial);
-  hull.rotation.z = Math.PI / 2;
+  // No rotation needed - ship faces forward by default
   hull.castShadow = true;
   hull.receiveShadow = true;
   ship.mesh.add(hull);
@@ -78,8 +78,8 @@ function createSpaceship() {
   // Hull nose cone
   const noseGeometry = new THREE.ConeGeometry(0.15, 0.8, 12);
   const nose = new THREE.Mesh(noseGeometry, metallicMaterial);
-  nose.position.set(2.1, 0, 0);
-  nose.rotation.z = Math.PI / 2;
+  nose.position.set(0, 0, 2.1); // Position along Z-axis (forward)
+  // No rotation needed - cone points forward by default
   nose.castShadow = true;
   nose.receiveShadow = true;
   ship.mesh.add(nose);
@@ -95,20 +95,20 @@ function createSpaceship() {
   // Top panel
   const topPanel = new THREE.Mesh(panelGeometry, panelMaterial);
   topPanel.position.set(0, 0.45, 0);
-  topPanel.rotation.z = Math.PI / 2;
+  // No rotation needed - box is already oriented correctly
   ship.mesh.add(topPanel);
 
   // Bottom panel
   const bottomPanel = new THREE.Mesh(panelGeometry, panelMaterial);
   bottomPanel.position.set(0, -0.45, 0);
-  bottomPanel.rotation.z = Math.PI / 2;
+  // No rotation needed - box is already oriented correctly
   ship.mesh.add(bottomPanel);
 
   // === ENHANCED COCKPIT ===
   const cockpitGeometry = new THREE.SphereGeometry(0.5, 16, 12, 0, Math.PI);
   const cockpit = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
-  cockpit.position.set(1.4, 0, 0);
-  cockpit.rotation.y = Math.PI / 2;
+  cockpit.position.set(0, 0, 1.4); // Position along Z-axis (forward)
+  // No rotation needed - sphere hemisphere faces forward by default
   ship.mesh.add(cockpit);
 
   // Cockpit frame
@@ -119,8 +119,8 @@ function createSpaceship() {
     specular: 0x666666
   });
   const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-  frame.position.set(1.4, 0, 0);
-  frame.rotation.y = Math.PI / 2;
+  frame.position.set(0, 0, 1.4); // Position along Z-axis (forward)
+  // No rotation needed - torus faces forward by default
   ship.mesh.add(frame);
 
   // === REALISTIC WINGS ===
@@ -134,26 +134,26 @@ function createSpaceship() {
   
   // Left wing with sweep
   const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
-  leftWing.position.set(-0.3, 0.7, 0);
-  leftWing.rotation.set(0, 0, -0.2);
+  leftWing.position.set(0, 0.7, -0.3); // Position along Z-axis (backward)
+  leftWing.rotation.set(0, -0.2, 0); // Rotate around Y-axis for sweep
   ship.mesh.add(leftWing);
   
   // Right wing with sweep
   const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
-  rightWing.position.set(-0.3, -0.7, 0);
-  rightWing.rotation.set(0, 0, 0.2);
+  rightWing.position.set(0, -0.7, -0.3); // Position along Z-axis (backward)
+  rightWing.rotation.set(0, 0.2, 0); // Rotate around Y-axis for sweep
   ship.mesh.add(rightWing);
 
   // Wing tips
   const wingTipGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.8);
   const leftWingTip = new THREE.Mesh(wingTipGeometry, darkMetalMaterial);
-  leftWingTip.position.set(-0.8, 1.2, 0);
-  leftWingTip.rotation.set(0, 0, -0.2);
+  leftWingTip.position.set(0, 1.2, -0.8); // Position along Z-axis (backward)
+  leftWingTip.rotation.set(0, -0.2, 0); // Rotate around Y-axis for sweep
   ship.mesh.add(leftWingTip);
 
   const rightWingTip = new THREE.Mesh(wingTipGeometry, darkMetalMaterial);
-  rightWingTip.position.set(-0.8, -1.2, 0);
-  rightWingTip.rotation.set(0, 0, 0.2);
+  rightWingTip.position.set(0, -1.2, -0.8); // Position along Z-axis (backward)
+  rightWingTip.rotation.set(0, 0.2, 0); // Rotate around Y-axis for sweep
   ship.mesh.add(rightWingTip);
 
   // === ENHANCED ENGINE SYSTEM ===
@@ -167,14 +167,14 @@ function createSpaceship() {
 
   // Left engine housing
   const leftEngineHousing = new THREE.Mesh(engineHousingGeometry, engineHousingMaterial);
-  leftEngineHousing.position.set(-1.8, 0.5, 0);
-  leftEngineHousing.rotation.z = Math.PI / 2;
+  leftEngineHousing.position.set(0, 0.5, -1.8); // Position along Z-axis (backward)
+  // No rotation needed - cylinder points forward by default
   ship.mesh.add(leftEngineHousing);
 
   // Right engine housing
   const rightEngineHousing = new THREE.Mesh(engineHousingGeometry, engineHousingMaterial);
-  rightEngineHousing.position.set(-1.8, -0.5, 0);
-  rightEngineHousing.rotation.z = Math.PI / 2;
+  rightEngineHousing.position.set(0, -0.5, -1.8); // Position along Z-axis (backward)
+  // No rotation needed - cylinder points forward by default
   ship.mesh.add(rightEngineHousing);
 
   // Engine nozzles with more detail
@@ -188,14 +188,14 @@ function createSpaceship() {
   
   // Left engine nozzle
   const leftEngine = new THREE.Mesh(nozzleGeometry, nozzleMaterial);
-  leftEngine.position.set(-2.4, 0.5, 0);
-  leftEngine.rotation.z = Math.PI / 2;
+  leftEngine.position.set(0, 0.5, -2.4); // Position along Z-axis (backward)
+  // No rotation needed - cylinder points forward by default
   ship.mesh.add(leftEngine);
   
   // Right engine nozzle
   const rightEngine = new THREE.Mesh(nozzleGeometry, nozzleMaterial);
-  rightEngine.position.set(-2.4, -0.5, 0);
-  rightEngine.rotation.z = Math.PI / 2;
+  rightEngine.position.set(0, -0.5, -2.4); // Position along Z-axis (backward)
+  // No rotation needed - cylinder points forward by default
   ship.mesh.add(rightEngine);
 
   // Engine cooling fins
@@ -208,14 +208,14 @@ function createSpaceship() {
   for (let i = 0; i < 6; i++) {
     const angle = (i / 6) * Math.PI * 2;
     const fin = new THREE.Mesh(finGeometry, finMaterial);
-    fin.position.set(-1.8, 0.5 + Math.cos(angle) * 0.25, Math.sin(angle) * 0.25);
-    fin.rotation.z = Math.PI / 2;
+    fin.position.set(Math.cos(angle) * 0.25, 0.5 + Math.sin(angle) * 0.25, -1.8); // Position along Z-axis (backward)
+    fin.rotation.x = Math.PI / 2; // Rotate to be perpendicular to engine
     fin.rotation.y = angle;
     ship.mesh.add(fin);
 
     const fin2 = new THREE.Mesh(finGeometry, finMaterial);
-    fin2.position.set(-1.8, -0.5 + Math.cos(angle) * 0.25, Math.sin(angle) * 0.25);
-    fin2.rotation.z = Math.PI / 2;
+    fin2.position.set(Math.cos(angle) * 0.25, -0.5 + Math.sin(angle) * 0.25, -1.8); // Position along Z-axis (backward)
+    fin2.rotation.x = Math.PI / 2; // Rotate to be perpendicular to engine
     fin2.rotation.y = angle;
     ship.mesh.add(fin2);
   }
@@ -229,7 +229,7 @@ function createSpaceship() {
     opacity: 0.9
   });
   const redLight = new THREE.Mesh(redLightGeometry, redLightMaterial);
-  redLight.position.set(0.8, 1.0, 0);
+  redLight.position.set(0, 1.0, 0.8); // Position along Z-axis (forward)
   ship.mesh.add(redLight);
   
   // Green light (starboard/right)
@@ -239,7 +239,7 @@ function createSpaceship() {
     opacity: 0.9
   });
   const greenLight = new THREE.Mesh(redLightGeometry, greenLightMaterial);
-  greenLight.position.set(0.8, -1.0, 0);
+  greenLight.position.set(0, -1.0, 0.8); // Position along Z-axis (forward)
   ship.mesh.add(greenLight);
 
   // White strobe light on top
@@ -250,7 +250,7 @@ function createSpaceship() {
     opacity: 0.9
   });
   const strobeLight = new THREE.Mesh(strobeGeometry, strobeMaterial);
-  strobeLight.position.set(0.5, 0, 0.3);
+  strobeLight.position.set(0, 0, 0.5); // Position along Z-axis (forward)
   ship.mesh.add(strobeLight);
 
   // === ANTENNA AND SENSORS ===
@@ -261,7 +261,8 @@ function createSpaceship() {
     shininess: 300
   });
   const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
-  antenna.position.set(1.8, 0, 0);
+  antenna.position.set(0, 0, 1.8); // Position along Z-axis (forward)
+  // No rotation needed - cylinder points up by default
   ship.mesh.add(antenna);
 
   // Sensor array
@@ -271,7 +272,7 @@ function createSpaceship() {
     shininess: 400
   });
   const sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
-  sensor.position.set(1.9, 0, 0);
+  sensor.position.set(0, 0, 1.9); // Position along Z-axis (forward)
   ship.mesh.add(sensor);
 
   // === ENHANCED ENGINE EFFECTS ===
@@ -285,14 +286,14 @@ function createSpaceship() {
   
   // Left engine glow
   const leftGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-  leftGlow.position.set(-2.8, 0.5, 0);
-  leftGlow.rotation.z = -Math.PI / 2;
+  leftGlow.position.set(0, 0.5, -2.8); // Position along Z-axis (backward)
+  leftGlow.rotation.x = Math.PI / 2; // Rotate to point backward
   ship.mesh.add(leftGlow);
   
   // Right engine glow
   const rightGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-  rightGlow.position.set(-2.8, -0.5, 0);
-  rightGlow.rotation.z = -Math.PI / 2;
+  rightGlow.position.set(0, -0.5, -2.8); // Position along Z-axis (backward)
+  rightGlow.rotation.x = Math.PI / 2; // Rotate to point backward
   ship.mesh.add(rightGlow);
 
   // Inner engine glow (hotter core)
@@ -304,13 +305,13 @@ function createSpaceship() {
   });
 
   const leftInnerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial);
-  leftInnerGlow.position.set(-2.6, 0.5, 0);
-  leftInnerGlow.rotation.z = -Math.PI / 2;
+  leftInnerGlow.position.set(0, 0.5, -2.6); // Position along Z-axis (backward)
+  leftInnerGlow.rotation.x = Math.PI / 2; // Rotate to point backward
   ship.mesh.add(leftInnerGlow);
 
   const rightInnerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial);
-  rightInnerGlow.position.set(-2.6, -0.5, 0);
-  rightInnerGlow.rotation.z = -Math.PI / 2;
+  rightInnerGlow.position.set(0, -0.5, -2.6); // Position along Z-axis (backward)
+  rightInnerGlow.rotation.x = Math.PI / 2; // Rotate to point backward
   ship.mesh.add(rightInnerGlow);
 
   // Store engine glows and navigation lights for animation
