@@ -38,9 +38,76 @@ const ship = {
 
 // ===================== SPACESHIP CREATION =====================
 
+// GLTF Loader for importing 3D models
+const loader = new THREE.GLTFLoader();
+
 function createSpaceship() {
   // Create main ship group to hold all parts
   ship.mesh = new THREE.Group();
+  
+  // Try to load a 3D model first, fallback to procedural if not found
+  loadSpaceshipModel();
+}
+
+function loadSpaceshipModel() {
+  // Check if there's a spaceship model in the assets folder
+  const modelPath = './assets/spaceship.gltf'; // You can change this path
+  
+  loader.load(
+    modelPath,
+    // onLoad callback
+    function(gltf) {
+      console.log('Spaceship model loaded successfully!');
+      
+      // Get the model from the loaded GLTF
+      const model = gltf.scene;
+      
+      // Scale the model to appropriate size (adjust as needed)
+      model.scale.set(2, 2, 2); // Scale up the model
+      
+      // Position the model (adjust as needed)
+      model.position.set(0, 0, 0);
+      
+      // Rotate the model to face forward if needed
+      // model.rotation.y = Math.PI; // Uncomment if model faces backward
+      
+      // Enable shadows on the model
+      model.traverse(function(child) {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+      
+      // Add the model to the ship group
+      ship.mesh.add(model);
+      
+      // Store reference to the model for potential future use
+      ship.model = model;
+      
+      // Add the ship group to the scene
+      scene.add(ship.mesh);
+      
+      console.log('Spaceship model added to scene');
+    },
+    // onProgress callback
+    function(progress) {
+      console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+    },
+    // onError callback
+    function(error) {
+      console.log('Error loading spaceship model:', error);
+      console.log('Falling back to procedural spaceship...');
+      
+      // Fallback to procedural ship if model loading fails
+      createProceduralSpaceship();
+    }
+  );
+}
+
+function createProceduralSpaceship() {
+  // This is the original procedural ship creation code as fallback
+  console.log('Creating procedural spaceship...');
 
   // === ENHANCED MATERIALS ===
   const metallicMaterial = new THREE.MeshPhongMaterial({ 

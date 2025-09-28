@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Spaceship Model Creator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+    <button onclick="exportModel()">Export as GLTF</button>
+    
+    <script>
+        // Create scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        // Create a simple spaceship
+        const ship = new THREE.Group();
+
+        // Hull
+        const hullGeometry = new THREE.CylinderGeometry(0.2, 0.1, 2, 8);
+        const hullMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
+        const hull = new THREE.Mesh(hullGeometry, hullMaterial);
+        hull.rotation.z = Math.PI / 2;
+        ship.add(hull);
+
+        // Nose
+        const noseGeometry = new THREE.ConeGeometry(0.1, 0.5, 8);
+        const nose = new THREE.Mesh(noseGeometry, hullMaterial);
+        nose.position.set(1.2, 0, 0);
+        nose.rotation.z = Math.PI / 2;
+        ship.add(nose);
+
+        // Wings
+        const wingGeometry = new THREE.BoxGeometry(0.8, 0.05, 0.3);
+        const wingMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+        
+        const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+        leftWing.position.set(0, 0.3, 0);
+        ship.add(leftWing);
+        
+        const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+        rightWing.position.set(0, -0.3, 0);
+        ship.add(rightWing);
+
+        // Engines
+        const engineGeometry = new THREE.CylinderGeometry(0.08, 0.1, 0.4, 8);
+        const engineMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+        
+        const leftEngine = new THREE.Mesh(engineGeometry, engineMaterial);
+        leftEngine.position.set(-0.8, 0.2, 0);
+        leftEngine.rotation.z = Math.PI / 2;
+        ship.add(leftEngine);
+        
+        const rightEngine = new THREE.Mesh(engineGeometry, engineMaterial);
+        rightEngine.position.set(-0.8, -0.2, 0);
+        rightEngine.rotation.z = Math.PI / 2;
+        ship.add(rightEngine);
+
+        scene.add(ship);
+
+        // Lighting
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+
+        camera.position.set(3, 3, 3);
+        camera.lookAt(0, 0, 0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ship.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        function exportModel() {
+            const exporter = new THREE.GLTFExporter();
+            exporter.parse(scene, function(gltf) {
+                const output = JSON.stringify(gltf, null, 2);
+                const blob = new Blob([output], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'spaceship.gltf';
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
