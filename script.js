@@ -437,15 +437,15 @@ function createStarfield() {
 
 // Solar system data with realistic relative sizes and distances (scaled up for visibility)
 const solarSystem = {
-  sun: { radius: 25, distance: 0, color: 0xffaa44, emissive: 0xff4400, name: "Sun" },
-  mercury: { radius: 2.5, distance: 50, color: 0x8c7853, speed: 0.02, name: "Mercury" },
-  venus: { radius: 3.5, distance: 70, color: 0xffc649, speed: 0.015, name: "Venus" },
-  earth: { radius: 4, distance: 90, color: 0x6b93d6, speed: 0.01, hasMoon: true, name: "Earth" },
-  mars: { radius: 2.2, distance: 110, color: 0xc1440e, speed: 0.008, name: "Mars" },
-  jupiter: { radius: 12, distance: 150, color: 0xd8ca9d, speed: 0.005, name: "Jupiter" },
-  saturn: { radius: 10, distance: 190, color: 0xfad5a5, speed: 0.003, hasRings: true, name: "Saturn" },
-  uranus: { radius: 5, distance: 230, color: 0x4fd0e7, speed: 0.002, name: "Uranus" },
-  neptune: { radius: 4.5, distance: 270, color: 0x4b70dd, speed: 0.001, name: "Neptune" }
+  sun: { radius: 35, distance: 0, color: 0xffaa44, emissive: 0xff4400, name: "Sun" },
+  mercury: { radius: 12.5, distance: 50, color: 0x8c7853, speed: 0.02, name: "Mercury" },
+  venus: { radius: 13.5, distance: 70, color: 0xffc649, speed: 0.015, name: "Venus" },
+  earth: { radius: 14, distance: 90, color: 0x6b93d6, speed: 0.01, hasMoon: true, name: "Earth" },
+  mars: { radius: 12.2, distance: 110, color: 0xc1440e, speed: 0.008, name: "Mars" },
+  jupiter: { radius: 22, distance: 150, color: 0xd8ca9d, speed: 0.005, name: "Jupiter" },
+  saturn: { radius: 20, distance: 190, color: 0xfad5a5, speed: 0.003, hasRings: true, name: "Saturn" },
+  uranus: { radius: 15, distance: 230, color: 0x4fd0e7, speed: 0.002, name: "Uranus" },
+  neptune: { radius: 14.5, distance: 270, color: 0x4b70dd, speed: 0.001, name: "Neptune" }
 };
 
 const planets = [];
